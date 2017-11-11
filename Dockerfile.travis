@@ -1,0 +1,11 @@
+FROM ros:kinetic-perception
+
+COPY . /catkin_ws/src/natnet_ros
+COPY ci_tests.sh /catkin_ws/
+
+WORKDIR /catkin_ws
+
+# Sourcing this before .bashrc runs breaks ROS completions
+RUN echo "\nsource /opt/ros/kinetic/setup.bash" >> /root/.bashrc
+
+CMD ["./ci_tests.sh"]

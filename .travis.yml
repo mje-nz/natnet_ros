@@ -1,0 +1,18 @@
+sudo: required
+services:
+  - docker
+
+# Handle git submodules ourselves (https://stackoverflow.com/a/24600210)
+git:
+    submodules: false
+
+before_install:
+  # Replace the SSH URL with the public URL, then initialize submodules
+  - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+  - git submodule update --init --recursive
+  # Build docker container with this repo in a catkin workspace, which runs 
+  # ci_test.sh when started
+  - docker build -t build_packages_and_run_tests . --file Dockerfile.travis
+
+script:
+  - docker run build_packages_and_run_tests
