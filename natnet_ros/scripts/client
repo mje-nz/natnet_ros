@@ -12,87 +12,90 @@ import os.path
 
 import rospy
 import rospkg
-from geometry_msgs.msg import Point, PointStamped, Pose, PoseStamped, Quaternion, Vector3
+from geometry_msgs.msg import Point, PointStamped, PoseStamped, Quaternion, Vector3
 from std_msgs.msg import ColorRGBA
 from visualization_msgs.msg import Marker
 
 import natnet
-import natnet.protocol.MocapFrameMessage
 
 
 MOCAP_FRAME = 'mocap_motive'
 
 
-def main(server_name):
-    rospy.init_node('mocap')
-    rigid_body_pubs = []
-    marker_vis_pub = [rospy.Publisher('~/markers/vis', Marker, queue_size=10)]
-    marker_pubs = {}
+class NatnetClientNode(object):
 
-    def callback(rigid_bodies, markers, timing):
-        """
+    def __init__(self):
+        self.rigid_body_pubs = []
+        self.marker_pubs = {}
+        self.marker_vis_pub = rospy.Publisher('~markers/vis', Marker, queue_size=10)
+        self.client = None
 
-        :type rigid_bodies: list[RigidBody]
-        :type markers: list[LabelledMarker]
-        :type timing: TimestampAndLatency
-        """
+    def mocap_frame_callback(self, rigid_bodies, markers, timing):
+        """Handle a frame of mocap data."""
         print()
         print('{:.1f}s: Received mocap frame'.format(timing.timestamp))
 
         if rigid_bodies:
             # Publish ~/rigid_bodies/i/pose topics
             for i, b in enumerate(rigid_bodies):
-                if i >= len(rigid_body_pubs):
-                    pub = rospy.Publisher('~/rigid_bodies/{}/pose'.format(i), PoseStamped, queue_size=10)
-                    rigid_body_pubs.append(pub)
+                if i >= len(self.rigid_body_pubs):
+                    pub = rospy.Publisher('~rigid_bodies/{}/pose'.format(i), PoseStamped, queue_size=10)
+                    self.rigid_body_pubs.append(pub)
                 message = PoseStamped()
                 message.header.frame_id = MOCAP_FRAME
                 message.header.stamp = rospy.Time(timing.timestamp)
                 message.pose.position = Point(*b.position)
                 message.pose.orientation = Quaternion(*b.orientation)
-                rigid_body_pubs[i].publish(message)
+                self.rigid_body_pubs[i].publish(message)
         if markers:
             # Publish ~/markers/vis topic
             message = Marker()
             message.header.frame_id = MOCAP_FRAME
             message.header.stamp = rospy.Time(timing.timestamp)
-            message.ns = 'python-natnet'
+            message.ns = 'natnet'
             message.id = 0
             message.type = Marker.SPHERE_LIST
             positions = [Point(*m.position) for m in markers]
             message.points = positions
             sizes = [m.size for m in markers]
-            mean_size = sum(sizes)/len(sizes)
+            mean_size = sum(sizes) / len(sizes)
             message.scale = Vector3(mean_size, mean_size, mean_size)
             message.color = ColorRGBA(1, 1, 1, 1)
-            marker_vis_pub[0].publish(message)
+            self.marker_vis_pub.publish(message)
             for m in markers:
                 if m.model_id == 0:
                     # For markers which are not part of a rigid body, publish ~/markers/i topic
                     try:
-                        pub = marker_pubs[m.marker_id]
+                        pub = self.marker_pubs[m.marker_id]
                     except KeyError:
-                        pub = rospy.Publisher('~/markers/{}'.format(m.marker_id), PointStamped, queue_size=10)
-                        marker_pubs[m.marker_id] = pub
+                        pub = rospy.Publisher('~markers/{}'.format(m.marker_id), PointStamped, queue_size=10)
+                        self.marker_pubs[m.marker_id] = pub
                     message = PointStamped()
                     message.header.frame_id = MOCAP_FRAME
                     message.header.stamp = rospy.Time(timing.timestamp)
                     message.point = Point(*m.position)
                     pub.publish(message)
 
-    if server_name == 'fake':
-        rospack = rospkg.RosPack()
-        path = rospack.get_path('python_natnet')
-        frame_filename = os.path.join(path, 'data', 'mocapframe_packet_v3.bin')
-        info_filename = os.path.join(path, 'data', 'serverinfo_packet_v3.bin')
-        client = natnet.fakes.FakeClient.fake_connect(frame_filename, info_filename)
-    else:
-        client = natnet.Client.connect(server_name)
-    client.set_callback(callback)
-    client.spin()
-    # TODO: Handle ROS shutdown properly
+    def run(self):
+        print(rospy.get_param('~fake'))
+        if rospy.get_param('~fake', False):
+            rospack = rospkg.RosPack()
+            path = rospack.get_path('python_natnet')
+            frame_filename = os.path.join(path, 'data', 'mocapframe_packet_v3.bin')
+            info_filename = os.path.join(path, 'data', 'serverinfo_packet_v3.bin')
+            client = natnet.fakes.FakeClient.fake_connect(frame_filename, info_filename)
+        else:
+            server = rospy.get_param('~server')
+            client = natnet.Client.connect(server)
+        client.set_callback(self.mocap_frame_callback)
+        client.spin()
 
 
 if __name__ == '__main__':
-    import sys
-    main(*sys.argv[1:])
+    rospy.init_node('mocap', disable_signals=True)
+    try:
+        node = NatnetClientNode()
+        node.run()
+    finally:
+        # TODO: Handle ROS shutdown properly
+        rospy.signal_shutdown(reason='Finished')
