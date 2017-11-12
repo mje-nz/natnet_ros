@@ -17,7 +17,6 @@ Features:
 
 ## TODO
 
-* Publish tf from to ROS node
 * Request model descriptions from server
 * Update model descriptions when notified of tracked model change in mocap frame
 * Rename python-natnet to python_natnet all the way, then link it from natnet-sdk-mirror (and link back)

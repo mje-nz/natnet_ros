@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
-"""Natnet client ROS node.
+"""NatNet client ROS node.
 
 Note that this node does not convert Motive's poses from y-up to z-up. You can do so with:
     rosrun tf static_transform_publisher 0 0 0 0 0 1.57079632679 mocap mocap_motive 100
+Or just set Motive to z-up.
 """
 
 from __future__ import print_function
@@ -12,14 +13,12 @@ import os.path
 
 import rospy
 import rospkg
-from geometry_msgs.msg import Point, PointStamped, PoseStamped, Quaternion, Vector3
+from geometry_msgs.msg import Point, PointStamped, PoseStamped, Quaternion, TransformStamped, Vector3
 from std_msgs.msg import ColorRGBA, Header
+import tf
 from visualization_msgs.msg import Marker
 
 import natnet
-
-
-MOCAP_FRAME = 'mocap_motive'
 
 
 class NatnetClientNode(object):
@@ -28,19 +27,31 @@ class NatnetClientNode(object):
         self.rigid_body_pubs = []
         self.marker_pubs = {}
         self.marker_vis_pub = rospy.Publisher('~markers/vis', Marker, queue_size=10)
+        self.tf_broadcaster = tf.TransformBroadcaster()
         self.client = None
+        self.mocap_frame = rospy.get_param('mocap_frame', 'mocap')
 
     def _publish_rigid_body_poses(self, header, rigid_bodies):
         """Publish ~rigid_bodies/i/pose topics."""
         for i, b in enumerate(rigid_bodies):
             if i >= len(self.rigid_body_pubs):
-                pub = rospy.Publisher('~rigid_bodies/{}/pose'.format(i), PoseStamped, queue_size=10)
+                pub = rospy.Publisher('~rigid_bodies/{}/pose'.format(b.id_), PoseStamped, queue_size=10)
                 self.rigid_body_pubs.append(pub)
             message = PoseStamped()
             message.header = header
             message.pose.position = Point(*b.position)
             message.pose.orientation = Quaternion(*b.orientation)
             self.rigid_body_pubs[i].publish(message)
+
+    def _publish_rigid_body_tfs(self, header, rigid_bodies):
+        """Publish mocap->bodyi transform for each rigid body."""
+        for i, b in enumerate(rigid_bodies):
+            message = TransformStamped()
+            message.header = header
+            message.child_frame_id = 'body{}'.format(b.id_)
+            message.transform.translation = Vector3(*b.position)
+            message.transform.rotation = Quaternion(*b.orientation)
+            self.tf_broadcaster.sendTransformMessage(message)
 
     def _publish_marker_vis(self, header, markers):
         """Publish ~markers/vis topic."""
@@ -77,11 +88,12 @@ class NatnetClientNode(object):
         print('{:.1f}s: Received mocap frame'.format(timing.timestamp))
 
         header = Header()
-        header.frame_id = MOCAP_FRAME
+        header.frame_id = self.mocap_frame
         header.stamp = rospy.Time(timing.timestamp)
 
         if rigid_bodies:
             self._publish_rigid_body_poses(header, rigid_bodies)
+            self._publish_rigid_body_tfs(header, rigid_bodies)
         if markers:
             self._publish_marker_points(header, markers)
             self._publish_marker_vis(header, markers)
