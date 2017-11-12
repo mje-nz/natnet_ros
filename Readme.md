@@ -27,6 +27,7 @@ Features:
 * Add has_model, is_unlabelled, is_active_markers flags in LabelledMarker from SDK 3.0.1
 * Test clock sync
 * Make clock sync optional
+* Use ROS logging properly
 * Release python_natnet on PyPI
 * Add benchmarks
 * Implement server auto-discovery
