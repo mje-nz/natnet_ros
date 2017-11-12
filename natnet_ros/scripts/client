@@ -29,7 +29,8 @@ class NatnetClientNode(object):
         self.marker_vis_pub = rospy.Publisher('~markers/vis', Marker, queue_size=10)
         self.tf_broadcaster = tf.TransformBroadcaster()
         self.client = None
-        self.mocap_frame = rospy.get_param('mocap_frame', 'mocap')
+        self.mocap_frame = rospy.get_param('~mocap_frame', 'mocap')
+        self.tf_remap = rospy.get_param('~tf_remap', {})  # type: dict
 
     def _publish_rigid_body_poses(self, header, rigid_bodies):
         """Publish ~rigid_bodies/i/pose topics."""
@@ -48,7 +49,8 @@ class NatnetClientNode(object):
         for i, b in enumerate(rigid_bodies):
             message = TransformStamped()
             message.header = header
-            message.child_frame_id = 'body{}'.format(b.id_)
+            child_frame = self.tf_remap.get(str(b.id_), 'body{}'.format(b.id_))
+            message.child_frame_id = child_frame
             message.transform.translation = Vector3(*b.position)
             message.transform.rotation = Quaternion(*b.orientation)
             self.tf_broadcaster.sendTransformMessage(message)
@@ -99,7 +101,6 @@ class NatnetClientNode(object):
             self._publish_marker_vis(header, markers)
 
     def run(self):
-        print(rospy.get_param('~fake'))
         if rospy.get_param('~fake', False):
             rospack = rospkg.RosPack()
             path = rospack.get_path('python_natnet')
