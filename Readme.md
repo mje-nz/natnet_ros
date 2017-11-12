@@ -20,6 +20,7 @@ Features:
 * Request model descriptions from server
 * Update model descriptions when notified of tracked model change in mocap frame
 * Rename python-natnet to python_natnet all the way, then link it from natnet-sdk-mirror (and link back)
+* Rearrange test data in python-natnet (or where it's installed) so the devel space works
 * Rename MocapFrame to FrameOfData
 * Update LabelledMarker with "entity_id" and "member_id" now that SDK 3.0.1 actually decodes that
 * Skip deserialising unlabelled markers now that SDK 3.0.1 deprecates them
