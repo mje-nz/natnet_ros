@@ -7,7 +7,6 @@ catkin_python_setup()
 
 catkin_package()
 
-install(DIRECTORY python_natnet/tests/
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/data
+install(DIRECTORY python_natnet/test_data DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
   FILES_MATCHING PATTERN "*.bin")
 

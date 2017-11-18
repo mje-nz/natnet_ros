@@ -111,9 +111,12 @@ class NatnetClientNode(object):
         if rospy.get_param('~fake', False):
             rospack = rospkg.RosPack()
             path = rospack.get_path('python_natnet')
-            frame_filename = os.path.join(path, 'data', 'mocapframe_packet_v3.bin')
-            info_filename = os.path.join(path, 'data', 'serverinfo_packet_v3.bin')
-            client = natnet.fakes.FakeClient.fake_connect(frame_filename, info_filename)
+            test_data_path = os.path.join(path, 'test_data')
+            if not os.path.exists(test_data_path):
+                # Awkwardly work around the folder layout being different in the devel space
+                test_data_path = os.path.join(path, 'python_natnet', 'test_data')
+                assert os.path.exists(test_data_path)
+            client = natnet.fakes.SingleFrameFakeClient.fake_connect(test_data_path)
         else:
             server = rospy.get_param('~server')
             client = natnet.Client.connect(server)
