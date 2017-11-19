@@ -19,41 +19,77 @@ import tf
 from visualization_msgs.msg import Marker
 
 import natnet
+from natnet_msgs.msg import MarkerList
+
+
+def validate_name(name):
+    """Remove illegal characters from a name to make it a valid ROS name.
+
+    Args:
+        name (str):
+    """
+    # TODO: Be more thorough
+    return name.replace(' ', '_').replace(':', '_').replace('-', '_').replace('/', '_')
 
 
 class NatnetClientNode(object):
 
     def __init__(self):
         self.rigid_body_pubs = {}  # type: dict[int, rospy.Publisher]
+        self.rigid_body_names = {}  # type: dict[int, str]
         self.marker_pubs = {}  # type: dict[int, rospy.Publisher]
+        self.leftover_markers_pub = rospy.Publisher('~markers/leftovers', MarkerList, queue_size=10)
         self.marker_vis_pub = rospy.Publisher('~markers/vis', Marker, queue_size=10)
         self.tf_broadcaster = tf.TransformBroadcaster()
         self.client = None  # type: natnet.comms.Client
         self.mocap_frame = rospy.get_param('~mocap_frame', 'mocap')
         self.tf_remap = rospy.get_param('~tf_remap', {})  # type: dict
 
-    def _publish_rigid_body_poses(self, header, rigid_bodies):
-        """Publish ~rigid_bodies/i/pose topics."""
+    def model_definitions_callback(self, rigid_bodies, skeletons, markersets):
+        # TODO: Make sure it's ok to just throw publishers away like this
+        self.rigid_body_pubs = {}
+        self.rigid_body_names = {}
+        self.marker_pubs = {}
         for b in rigid_bodies:
-            if not b.id_ in self.rigid_body_pubs:
-                pub = rospy.Publisher('~rigid_bodies/{}/pose'.format(b.id_), PoseStamped, queue_size=10)
-                self.rigid_body_pubs[b.id_] = pub
+            name = validate_name(b.name)
+            if b.id_ in self.rigid_body_pubs:
+                # TODO: Handle this more gracefully
+                raise RuntimeError('Two rigid bodies with the same streaming ID')
+            pub = rospy.Publisher('~rigid_bodies/{}/pose'.format(name), PoseStamped, queue_size=10)
+            self.rigid_body_pubs[b.id_] = pub
+            self.rigid_body_names[b.id_] = name
+            for marker_id in range(1, len(b.marker_positions) + 1):
+                topic = '~rigid_bodies/{}/marker{}'.format(name, marker_id)
+                pub = rospy.Publisher(topic, PointStamped, queue_size=10)
+                self.marker_pubs[(b.id_, marker_id)] = pub
+
+    def _publish_rigid_body_poses(self, header, rigid_bodies):
+        """Publish ~rigid_bodies/name/pose topics."""
+        for b in rigid_bodies:
             message = PoseStamped()
             message.header = header
             message.pose.position = Point(*b.position)
             message.pose.orientation = Quaternion(*b.orientation)
-            self.rigid_body_pubs[b.id_].publish(message)
+            try:
+                self.rigid_body_pubs[b.id_].publish(message)
+            except KeyError:
+                print('Unknown rigid body {}'.format(b.id_))
 
     def _publish_rigid_body_tfs(self, header, rigid_bodies):
-        """Publish mocap->bodyi transform for each rigid body."""
+        """Publish mocap->name transform for each rigid body."""
         for b in rigid_bodies:
             message = TransformStamped()
             message.header = header
-            child_frame = self.tf_remap.get(str(b.id_), 'body{}'.format(b.id_))
-            message.child_frame_id = child_frame
-            message.transform.translation = Vector3(*b.position)
-            message.transform.rotation = Quaternion(*b.orientation)
-            self.tf_broadcaster.sendTransformMessage(message)
+            try:
+                child_frame = self.rigid_body_names[b.id_]
+                if child_frame in self.tf_remap:
+                    child_frame = self.tf_remap[child_frame]
+                message.child_frame_id = child_frame
+                message.transform.translation = Vector3(*b.position)
+                message.transform.rotation = Quaternion(*b.orientation)
+                self.tf_broadcaster.sendTransformMessage(message)
+            except KeyError:
+                print('Unknown rigid body {}'.format(b.id_))
 
     def _publish_marker_vis(self, header, markers):
         """Publish ~markers/vis topic."""
@@ -73,23 +109,25 @@ class NatnetClientNode(object):
     def _publish_marker_points(self, header, markers):
         """Publish a PointStamped topic for each marker.
 
-        For markers which are part of a rigid body, publish ~rigid_bodies/j/markeri topic.  Otherwise, publish
-        ~markers/i topic.
+        Markers which are part of a rigid body are published as ~rigid_bodies/name/markeri. The rest are published in
+        a natnet_msgs/MarkerList as ~markers/leftovers.
         """
+        leftovers_msg = MarkerList()
+        leftovers_msg.header = header
         for m in markers:
-            try:
-                pub = self.marker_pubs[(m.model_id, m.marker_id)]
-            except KeyError:
-                if m.model_id == 0:
-                    topic = '~markers/{}'.format(m.marker_id)
-                else:
-                    topic = '~rigid_bodies/{}/marker{}'.format(m.model_id, m.marker_id)
-                pub = rospy.Publisher(topic, PointStamped, queue_size=10)
-                self.marker_pubs[(m.model_id, m.marker_id)] = pub
-            message = PointStamped()
-            message.header = header
-            message.point = Point(*m.position)
-            pub.publish(message)
+            if m.model_id != 0:
+                try:
+                    pub = self.marker_pubs[(m.model_id, m.marker_id)]
+                    message = PointStamped()
+                    message.header = header
+                    message.point = Point(*m.position)
+                    pub.publish(message)
+                except KeyError:
+                    print('Unknown marker {} from rigid body {}'.format(m.marker_id, m.model_id))
+            else:
+                leftovers_msg.ids.append(m.marker_id)
+                leftovers_msg.positions.append(Point(*m.position))
+        self.leftover_markers_pub.publish(leftovers_msg)
 
     def mocap_frame_callback(self, rigid_bodies, markers, timing):
         """Handle a frame of mocap data."""
@@ -117,9 +155,11 @@ class NatnetClientNode(object):
                 test_data_path = os.path.join(path, 'python_natnet', 'test_data')
                 assert os.path.exists(test_data_path)
             client = natnet.fakes.SingleFrameFakeClient.fake_connect(test_data_path)
+            print('Using fake client')
         else:
             server = rospy.get_param('~server')
             client = natnet.Client.connect(server)
+        client.set_model_callback(self.model_definitions_callback)
         client.set_callback(self.mocap_frame_callback)
         client.spin()
 

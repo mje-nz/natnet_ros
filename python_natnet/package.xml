@@ -6,7 +6,7 @@
   <maintainer email="matthew@matthewedwards.co.nz">Matthew Edwards</maintainer>
   <author email="matthew@matthewedwards.co.nz">Matthew Edwards</author>
   <license>BSD</license>
-  <url type="website">https://github.com/mje-nz/python-natnet</url>
+  <url type="website">https://github.com/mje-nz/python_natnet</url>
 
   <buildtool_depend>catkin</buildtool_depend>
 </package>

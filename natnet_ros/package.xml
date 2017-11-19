@@ -6,7 +6,7 @@
   <maintainer email="matthew@matthewedwards.co.nz">Matthew Edwards</maintainer>
   <author email="matthew@matthewedwards.co.nz">Matthew Edwards</author>
   <license>BSD</license>
-  <url type="website">https://github.com/mje-nz/natnet-ros</url>
+  <url type="website">https://github.com/mje-nz/natnet_ros</url>
 
   <buildtool_depend>catkin</buildtool_depend>
   <depend>std_msgs</depend>
@@ -14,4 +14,5 @@
   <depend>visualization_msgs</depend>
   <depend>rospy</depend>
   <depend>python_natnet</depend>
+  <depend>natnet_msgs</depend>
 </package>

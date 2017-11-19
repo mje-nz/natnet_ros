@@ -8,6 +8,6 @@ find_package(catkin REQUIRED COMPONENTS rospy python_natnet)
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
 # catkin_python_setup()
 
-catkin_package(CATKIN_DEPENDS rospy)
+catkin_package(CATKIN_DEPENDS rospy natnet_msgs)
 
 catkin_install_python(PROGRAMS scripts/client DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
