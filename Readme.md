@@ -8,15 +8,17 @@ The actual NatNet implemention is in [mje-nz/python_natnet](https://github.com/m
 Features:
 
 * Doesn't crash all the time, unlike mocap_optitrack
-* Runs at full camera framerate, unlike vrpn_client_ros
+* Publishes individual markers, unlike vrpn_client_ros
 * All topics are timestamped with the camera mid-exposure time (give or take a few tenths of a millisecond)
 * Publishes rigid bodies as `geometry_msgs/PoseStamped`
-* Publishes markers that aren't in rigid bodies as `geometry_msgs/PointStamped`
+* Publishes markers as `geometry_msgs/PointStamped`
 * Publishes all markers together as `visualization_msgs/Marker` (`SPHERE_LIST`) for Rviz
 
 
 ## TODO
 
+* Add duplicate marker ID check and report bug
+* Figure out why "solver replaces occlusion" isn't working
 * Set rate for fake client
 * Set appropriate timestamps for fake client
 * Use model descriptions to set up topics
