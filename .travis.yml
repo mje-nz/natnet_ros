@@ -8,4 +8,5 @@ before_install:
   - docker build -t build_packages_and_run_tests . --file Dockerfile.travis
 
 script:
-  - docker run build_packages_and_run_tests
+  - docker run -it -v $(pwd):/catkin_ws/out build_packages_and_run_tests
+  - bash <(curl -s https://codecov.io/bash)

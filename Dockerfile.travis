@@ -1,6 +1,8 @@
 FROM ros:kinetic-perception
 
-RUN apt-get update && apt-get install -y python-catkin-tools \
+RUN apt-get update && apt-get install -y \
+        python-catkin-tools \
+        python-coverage \
     && rm -rf /var/lib/apt/lists/*
 
 # Sourcing this before .bashrc runs breaks ROS completions
