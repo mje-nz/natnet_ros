@@ -20,16 +20,7 @@ Features:
 
 * Add duplicate marker ID check and report bug
 * Figure out why "solver replaces occlusion" isn't working
-* Set rate for fake client
-* Set appropriate timestamps for fake client
-* Link python_natnet from natnet-sdk-mirror (and link back)
 * Rename MocapFrame to FrameOfData
-* Update LabelledMarker with "entity_id" and "member_id" now that SDK 3.0.1 actually decodes that
-* Skip deserialising unlabelled markers now that SDK 3.0.1 deprecates them
-* Add has_model, is_unlabelled, is_active_markers flags in LabelledMarker from SDK 3.0.1
 * Make clock sync optional
-* Use ROS logging properly
 * Release python_natnet on PyPI
-* Implement server auto-discovery
 * Add tests for ROS node
-* Implement server and integration test networking code
