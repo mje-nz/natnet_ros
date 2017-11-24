@@ -1,5 +1,6 @@
 # NatNet 3 ROS driver
 [![Build Status](https://travis-ci.org/mje-nz/natnet_ros.svg?branch=master)](https://travis-ci.org/mje-nz/natnet_ros)
+[![codecov](https://codecov.io/gh/mje-nz/natnet_ros/branch/master/graph/badge.svg)](https://codecov.io/gh/mje-nz/natnet_ros)
 
 This package contains a ROS driver for the NatNet protocol used by the NaturalPoint OptiTrack motion capture system.
 It supports NatNet version 3.0 (the version used by Motive 2.0), which is a bit more efficient and adds more accurate timing.
