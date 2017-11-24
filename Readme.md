@@ -3,7 +3,7 @@
 
 This package contains a ROS driver for the NatNet protocol used by the NaturalPoint OptiTrack motion capture system.
 It supports NatNet version 3.0 (the version used by Motive 2.0), which is a bit more efficient and adds more accurate timing.
-The actual NatNet implemention is in [mje-nz/python_natnet](https://github.com/mje-nz/python_natnet), which is included as a submodule and repackaged.
+The actual NatNet implementation is in [mje-nz/python_natnet](https://github.com/mje-nz/python_natnet), which is included as a submodule and repackaged.
 
 Features:
 
@@ -23,4 +23,3 @@ Features:
 * Rename MocapFrame to FrameOfData
 * Make clock sync optional
 * Release python_natnet on PyPI
-* Add tests for ROS node

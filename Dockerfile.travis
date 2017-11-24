@@ -1,11 +1,14 @@
 FROM ros:kinetic-perception
 
-COPY . /catkin_ws/src/natnet_ros
-COPY ci_tests.sh /catkin_ws/
-
-WORKDIR /catkin_ws
+RUN apt-get update && apt-get install -y python-catkin-tools \
+    && rm -rf /var/lib/apt/lists/*
 
 # Sourcing this before .bashrc runs breaks ROS completions
 RUN echo "\nsource /opt/ros/kinetic/setup.bash" >> /root/.bashrc
+
+WORKDIR /catkin_ws
+COPY ci_tests.sh .
+COPY ci_util.sh .
+COPY . src/natnet_ros
 
 CMD ["./ci_tests.sh"]

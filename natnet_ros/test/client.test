@@ -1,0 +1,83 @@
+<launch>
+  <arg name="rate" default="10" />
+
+  <node pkg="natnet_ros" type="client" name="mocap">
+    <param name="fake" value="True"/>
+    <param name="rate" value="$(arg rate)"/>
+  </node>
+
+  <test test-name="fake_publishtest"
+        pkg="rostest" type="publishtest" time-limit="10">
+    <rosparam>
+      topics:
+        - name: /mocap/rigid_bodies/RaceQuad/pose
+          timeout: 2
+        - name: /mocap/rigid_bodies/RaceQuad/marker1
+          timeout: 2
+        - name: /mocap/rigid_bodies/RaceQuad/marker2
+          timeout: 2
+        - name: /mocap/rigid_bodies/RaceQuad/marker3
+          timeout: 2
+        - name: /mocap/rigid_bodies/RaceQuad/marker4
+          timeout: 2
+        - name: /mocap/rigid_bodies/RaceQuad/marker5
+          timeout: 2
+        - name: /mocap/markers/leftovers
+          timeout: 2
+        - name: /mocap/markers/vis
+          timeout: 2
+        - name: /tf
+          timeout: 2
+    </rosparam>
+  </test>
+
+  <test test-name="pose_hztest"
+        pkg="rostest" type="hztest">
+    <rosparam subst_value="True">
+      topic: /mocap/rigid_bodies/RaceQuad/pose
+      hz: $(arg rate)
+      hzerror: 1
+      test_duration: 2
+    </rosparam>
+  </test>
+
+  <test test-name="marker1_hztest"
+        pkg="rostest" type="hztest">
+    <rosparam subst_value="True">
+      topic: /mocap/rigid_bodies/RaceQuad/marker1
+      hz: $(arg rate)
+      hzerror: 1
+      test_duration: 2
+    </rosparam>
+  </test>
+
+  <test test-name="leftovers_hztest"
+        pkg="rostest" type="hztest">
+    <rosparam subst_value="True">
+      topic: /mocap/markers/leftovers
+      hz: $(arg rate)
+      hzerror: 1
+      test_duration: 2
+    </rosparam>
+  </test>
+
+  <test test-name="vis_hztest"
+        pkg="rostest" type="hztest">
+    <rosparam subst_value="True">
+      topic: /mocap/markers/vis
+      hz: $(arg rate)
+      hzerror: 1
+      test_duration: 2
+    </rosparam>
+  </test>
+
+  <test test-name="tf_hztest"
+        pkg="rostest" type="hztest">
+    <rosparam subst_value="True">
+      topic: /tf
+      hz: $(arg rate)
+      hzerror: 1
+      test_duration: 2
+    </rosparam>
+  </test>
+</launch>

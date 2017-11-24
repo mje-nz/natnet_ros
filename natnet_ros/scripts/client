@@ -26,8 +26,8 @@ class RosLogger(natnet.Logger):
 
     debug = rospy.logdebug
     info = rospy.loginfo
-    warning = rospy.logwarning
-    error = rospy.logerror
+    warning = rospy.logwarn
+    error = rospy.logerr
     fatal = rospy.logfatal
 
 
@@ -44,6 +44,7 @@ def validate_name(name):
 class NatnetClientNode(object):
 
     def __init__(self):
+        self.log = RosLogger()
         self.rigid_body_pubs = {}  # type: dict[int, rospy.Publisher]
         self.rigid_body_names = {}  # type: dict[int, str]
         self.marker_pubs = {}  # type: dict[int, rospy.Publisher]
@@ -140,8 +141,7 @@ class NatnetClientNode(object):
 
     def mocap_frame_callback(self, rigid_bodies, markers, timing):
         """Handle a frame of mocap data."""
-        print()
-        print('{:.1f}s: Received mocap frame'.format(timing.timestamp))
+        self.log.debug('{:.1f}s: Received mocap frame'.format(timing.timestamp))
 
         header = Header()
         header.frame_id = self.mocap_frame
@@ -171,10 +171,10 @@ class NatnetClientNode(object):
                 log.warning('Invalid rate %s, using no rate limit', rate)
                 rate=None
             log.info('Using fake client')
-            client = natnet.fakes.SingleFrameFakeClient.fake_connect(rate, log, test_data_path)
+            client = natnet.fakes.SingleFrameFakeClient.fake_connect(rate, self.log, test_data_path)
         else:
             server = rospy.get_param('~server', None)
-            client = natnet.Client.connect(server, logger=log)
+            client = natnet.Client.connect(server, logger=self.log)
         client.set_model_callback(self.model_definitions_callback)
         client.set_callback(self.mocap_frame_callback)
         client.spin()
