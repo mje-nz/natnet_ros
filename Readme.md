@@ -32,7 +32,6 @@ Features:
 * Rename MocapFrame to FrameOfData
 * Make clock sync optional
 * Release python_natnet on PyPI
-* Add licensing boilerplate everywhere
 * Add CONTRIBUTING etc
 
 
