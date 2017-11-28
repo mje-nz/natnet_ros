@@ -1,11 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
-"""NatNet client ROS node.
-
-Note that this node does not convert Motive's poses from y-up to z-up. You can do so with:
-    rosrun tf static_transform_publisher 0 0 0 0 0 1.57079632679 mocap mocap_motive 100
-Or just set Motive to z-up.
-"""
+"""NatNet client ROS node."""
 
 from __future__ import print_function
 
