@@ -26,6 +26,8 @@
           timeout: 2
         - name: /mocap/rigid_bodies/RaceQuad/marker5
           timeout: 2
+        - name: /mocap/rigid_bodies/RaceQuad/markers
+          timeout: 2
         - name: /mocap/markers/leftovers
           timeout: 2
         - name: /mocap/markers/vis

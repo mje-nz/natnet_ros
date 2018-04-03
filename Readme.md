@@ -28,11 +28,16 @@ Features:
 ## TODO
 
 * Add duplicate marker ID check and report bug
-* Figure out why "solver replaces occlusion" isn't working
+* Document "solver replaces occlusion" behaviour and implement workaround
 * Rename MocapFrame to FrameOfData
 * Make clock sync optional
 * Release python_natnet on PyPI
 * Add CONTRIBUTING etc
+* Make sure unknown message IDs, failure to decode messages etc doesn't result in a crash
+* Make sure to use the same variable signedness as the SDK
+* Use rospy.spin
+* Add warning when unnecessary data is being streamed
+* Add guidance for appropriate Motive settings
 
 
 ## ROS API
@@ -55,6 +60,10 @@ If you need Motive to use y-up for some reason, you can fix it with:
 
   Position of each marker of each rigid body.
   The ID is taken from the NatNet stream (i.e., from Motive).
+
+* `~rigid_bodies/<name>/markers` (natnet_msgs/MarkerList)
+
+  Position and ID of each marker of each marker of each rigid body as a list.
 
 * `~markers/leftovers` (natnet_msgs/MarkerList)
 
