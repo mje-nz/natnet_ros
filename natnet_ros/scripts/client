@@ -147,7 +147,7 @@ class NatnetClientNode(object):
         leftovers_msg.header = header
 
         for rigid_body_id, rigid_body_markers in itertools.groupby(markers, lambda m: m.model_id):
-            if rigid_body_id != 0:
+            if rigid_body_id != 0 and rigid_body_id in self.markerlist_pubs.keys():
                 markers_msg = MarkerList()
                 markers_msg.header = header
                 for m in rigid_body_markers:
