@@ -39,17 +39,33 @@ Features:
 * Add warning when unnecessary data is being streamed
 * Add guidance for appropriate Motive settings
 
+
 ## Installation
 
-* Under your catkin workspace's src directory (e.g `~/catkin_ws/src`) clone this
-repository (i.e., `git clone git@github.com:mje-nz/natnet_ros.git` or `git clone https://github.com/mje-nz/natnet_ros.git`)
-* Navigate to `cd ~/catkin_ws/src/natnet_ros/python_natnet/python_natnet` and clone the following repository:
-`git clone git@github.com:mje-nz/python_natnet.git .` or `git clone https://github.com/mje-nz/python_natnet.git .`.
-* Run `rosdep update`
-* Install `attrs` Python package using `pip install --user attrs` or `pip2.7 install --user attrs`
-(**note** it's `attrs` not `attr`).
-* Test it with some fake data: `rosrun natnet_ros client _fake` or with a real server:
-`rosrun natnet_ros client _server:="your_ip_address_here".
+From Kinetic (any metapackage) or Indigo (any metapackage plus pip):
+
+```
+mkdir -p catkin_ws/src/
+cd catkin_ws/src
+git clone --recursive https://github.com/mje-nz/natnet_ros.git
+cd ..
+rosdep install -y --from-paths src --ignore-src
+catkin_make
+source devel/setup.bash
+```
+
+Then, if you have a ROS Master running, you can test it with a fake server:
+
+```
+rosrun natnet_ros client _fake:=true
+```
+
+or run against your real Motive instance:
+
+```
+rosrun natnet_ros client _server:=(Motive IP)
+```
+
 
 
 ## ROS API
