@@ -6,11 +6,10 @@ This package contains a ROS driver for the NatNet protocol used by the NaturalPo
 It supports NatNet version 3.0 (the version used by Motive 2.0), which is a bit more efficient and adds more accurate timing.
 The actual NatNet implementation is in [mje-nz/python_natnet](https://github.com/mje-nz/python_natnet), which is included as a submodule and repackaged.
 
-Only the latest version of Motive is supported.
-Older versions (i.e., older NatNet protocol versions) probably mostly work, but are not tested.
+Only tested on Motive 2.0, although 2.1 is reported to work and older versions (i.e., older NatNet protocol versions) probably mostly work.
 Skeletons, force plates, and other peripherals probably mostly work in the underlying library but are not tested and are not published as ROS topics.
 
-Kinetic is the only supported ROS version, but older and newer versions probably work too.
+Only supported on ROS Kinetic, but it works on Indigo and probably on newer distributions too.
 The underlying library supports Python 2.7 and 3.4-3.6 on Linux, Windows and macOS.
 Both this package and the library have CI for all supported platforms.
 
@@ -67,14 +66,15 @@ rosrun natnet_ros client _server:=(Motive IP)
 ```
 
 
-
 ## ROS API
 
 The `client` node connects to a NatNet server and publishes the data as ROS topics.
 The data and descriptions are used directly, so make to give your rigid bodies unique streaming IDs and sensible names, and set the axis convention to z-up.
 If you need Motive to use y-up for some reason, you can fix it with:
 
-```rosrun tf static_transform_publisher 0 0 0 0 0 1.57079632679 mocap_z_up mocap 100```
+```
+rosrun tf static_transform_publisher 0 0 0 0 0 1.57079632679 mocap_z_up mocap 100
+```
 
 
 ### Published topics
@@ -128,3 +128,4 @@ If you need Motive to use y-up for some reason, you can fix it with:
 
   Dict params are a bit tricky to use in Kinetic or earlier: a literal works with `rosrun`, but using a dict literal as a parameter value in a launch file doesn't work until Lunar.
   Using a `rosparam` tag works though.
+
