@@ -6,8 +6,9 @@ This package contains a ROS driver for the NatNet protocol used by the NaturalPo
 It supports NatNet version 3.0 (the version used by Motive 2.0), which is a bit more efficient and adds more accurate timing.
 The actual NatNet implementation is in [mje-nz/python_natnet](https://github.com/mje-nz/python_natnet), which is included as a submodule and repackaged.
 
-Only tested on Motive 2.0, although 2.1 is reported to work and older versions (i.e., older NatNet protocol versions) probably mostly work.
-Skeletons, force plates, and other peripherals probably mostly work in the underlying library but are not tested and are not published as ROS topics.
+Only regularly tested on Motive 2.0, although 2.1 is reported to work.
+Support for older versions (i.e., older NatNet protocol versions) and skeletons is in progress.
+Force plates, and other peripherals probably mostly work in the underlying library but are not tested and are not published as ROS topics.
 
 Only supported on ROS Kinetic, but it works on Indigo and probably on newer distributions too.
 The underlying library supports Python 2.7 and 3.4-3.6 on Linux, Windows and macOS.
@@ -18,7 +19,7 @@ Features:
 * Doesn't crash all the time, unlike mocap_optitrack did when I last tried it many years ago
 * Synchronizes clocks to get timestamps right, unlike vrpn_client_ros
 * All topics are timestamped with the camera mid-exposure time (give or take a few tenths of a millisecond)
-* Publishes rigid bodies as `geometry_msgs/PoseStamped`
+* Publishes rigid bodies (including skeleton bones) as `geometry_msgs/PoseStamped`
 * Publishes markers as `geometry_msgs/PointStamped`
 * Publishes markers that aren't in a rigid body as `natnet_msgs/MarkerList`, because they change ID a lot
 * Publishes all markers together as `visualization_msgs/Marker` (`SPHERE_LIST`) for Rviz
@@ -93,6 +94,11 @@ rosrun tf static_transform_publisher 0 0 0 0 0 1.57079632679 mocap_z_up mocap 10
 
   Position and ID of each marker of each marker of each rigid body as a list.
 
+* `~skeletons/<skeleton_name>/<bone_name>/pose` (geometry_msgs/PoseStamped)
+
+  Skeleton bone pose.
+  The names are taken from the NatNet stream (i.e., from Motive), with a bit of an attempt to make sure they're valid ROS names.
+
 * `~markers/leftovers` (natnet_msgs/MarkerList)
 
   Position and ID of any markers that aren't in a rigid body.
@@ -113,9 +119,13 @@ rosrun tf static_transform_publisher 0 0 0 0 0 1.57079632679 mocap_z_up mocap 10
 
   Use fake data instead of connecting to a real server.
 
+* `~fake_v2` (`bool`, default: false)
+
+  Use fake NatNet 2.10 data instead of connecting to a real server.
+
 * `~rate` (`int`, default: 100)
 
-  If `fake` is true, the rate at which to publish the fake data (in Hz).
+  If `fake` or `fake_v2` is true, the rate at which to publish the fake data (in Hz).
 
 * `~mocap_frame` (`string`, default: 'mocap')
 
