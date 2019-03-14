@@ -15,7 +15,7 @@ Both this package and the library have CI for all supported platforms.
 
 Features:
 
-* Doesn't crash all the time, unlike mocap_optitrack
+* Doesn't crash all the time, unlike mocap_optitrack did when I last tried it many years ago
 * Synchronizes clocks to get timestamps right, unlike vrpn_client_ros
 * All topics are timestamped with the camera mid-exposure time (give or take a few tenths of a millisecond)
 * Publishes rigid bodies as `geometry_msgs/PoseStamped`
