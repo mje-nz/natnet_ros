@@ -27,6 +27,7 @@ Features:
 
 ## TODO
 
+* **Merge to_test branch**
 * Add duplicate marker ID check and report bug
 * Document "solver replaces occlusion" behaviour and implement workaround
 * Rename MocapFrame to FrameOfData
@@ -65,6 +66,14 @@ or run against your real Motive instance:
 ```
 rosrun natnet_ros client _server:=(Motive IP)
 ```
+
+
+## Motive settings
+
+**TODO**
+
+Only multicast mode is supported.
+For old versions of Motive (< 2.0), only the default address (239.255.42.99) and port (1511) are supported.
 
 
 ## ROS API
