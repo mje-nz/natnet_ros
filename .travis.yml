@@ -2,11 +2,15 @@ sudo: required
 services:
   - docker
 
-jobs:
+matrix: 
   include:
     - name: indigo
-      script: docker run --rm -it -v $(pwd):/catkin_ws/src/natnet_ros -w /catkin_ws ros:indigo-perception src/natnet_ros/ci.sh
+      env: IMAGE=ros:indigo-perception
     - name: kinetic
-      script: docker run --rm -it -v $(pwd):/catkin_ws/src/natnet_ros -w /catkin_ws ros:kinetic-perception src/natnet_ros/ci.sh
+      env: IMAGE=ros:kinetic-perception  
     - name: melodic
-      script: docker run --rm -it -v $(pwd):/catkin_ws/src/natnet_ros -w /catkin_ws ros:melodic-perception src/natnet_ros/ci.sh
+      env: IMAGE=ros:melodic-perception
+
+script: 
+  - CODECOV_ENV=`bash <(curl -s https://codecov.io/env)`
+  - docker run -it -v $(pwd):/catkin_ws/src/natnet_ros -w /catkin_ws $CODECOV_ENV $IMAGE src/natnet_ros/ci.sh

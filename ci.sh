@@ -13,10 +13,12 @@ travis_run catkin build --no-status --summarize
 source install/setup.bash
 
 travis_run catkin build --catkin-make-args run_tests -- --no-status --summarize
-catkin_test_results --verbose
+travis_run catkin_test_results --verbose
+
+mkdir out
 cp ~/.ros/.coverage out/
+cp src/natnet_ros/codecov.yml out/
 cd out
 travis_run python -m coverage report
 travis_run python -m coverage xml -i
-
 travis_run bash <(curl -s https://codecov.io/bash)
