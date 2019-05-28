@@ -2,11 +2,11 @@ sudo: required
 services:
   - docker
 
-before_install:
-  # Build docker container with this repo in a catkin workspace, which runs 
-  # ci_test.sh when started
-  - docker build -t build_packages_and_run_tests . --file Dockerfile.travis
-
-script:
-  - docker run -it -v $(pwd):/catkin_ws/out build_packages_and_run_tests
-  - bash <(curl -s https://codecov.io/bash)
+jobs:
+  include:
+    - name: indigo
+      script: docker run --rm -it -v $(pwd):/catkin_ws/src/natnet_ros -w /catkin_ws ros:indigo-perception src/natnet_ros/ci.sh
+    - name: kinetic
+      script: docker run --rm -it -v $(pwd):/catkin_ws/src/natnet_ros -w /catkin_ws ros:kinetic-perception src/natnet_ros/ci.sh
+    - name: melodic
+      script: docker run --rm -it -v $(pwd):/catkin_ws/src/natnet_ros -w /catkin_ws ros:melodic-perception src/natnet_ros/ci.sh

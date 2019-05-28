@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # From https://github.com/ros-planning/natnet_ros_ci/blob/master/util.sh
 
 #********************************************************************
