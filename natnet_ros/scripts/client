@@ -27,11 +27,23 @@ from natnet_msgs.msg import MarkerList
 
 class RosLogger(natnet.Logger):
 
-    debug = rospy.logdebug
-    info = rospy.loginfo
-    warning = rospy.logwarn
-    error = rospy.logerr
-    fatal = rospy.logfatal
+    # Until Lunar rospy.log* are instance methods and from Lunar on they're
+    # functions, so in order to work in both cases we have to wrap them
+
+    def debug(self, *args, **kwargs):
+        rospy.logdebug(*args, **kwargs)
+
+    def info(self, *args, **kwargs):
+        rospy.loginfo(*args, **kwargs)
+
+    def warning(self, *args, **kwargs):
+        rospy.logwarning(*args, **kwargs)
+
+    def error(self, *args, **kwargs):
+        rospy.logerror(*args, **kwargs)
+
+    def fatal(self, *args, **kwargs):
+        rospy.logfatal(*args, **kwargs)
 
 
 def validate_name(name):
@@ -111,6 +123,8 @@ class NatnetClientNode(object):
                 raise RuntimeError('Two skeletons with the same streaming ID')
             self.skeleton_names[s.id_] = name
 
+            print('Skeleton names:', self.skeleton_names)
+
             # TODO: How to publish skeleton?
 
             for bone in s.rigid_bodies:
@@ -119,6 +133,7 @@ class NatnetClientNode(object):
                 bone_name = validate_name(bone.name)
                 self.bone_names[(s.id_, bone.id_)] = bone_name
                 topic = '~skeletons/{}/{}/pose'.format(name, bone_name)
+                print('Will publish skeleton {} bone {} ({}) on {} '.format(s.id_, bone.id_, bone_name, topic))
                 pub = rospy.Publisher(topic, PoseStamped, queue_size=10)
                 self.bone_pubs[(s.id_, bone.id_)] = pub
 
@@ -226,6 +241,8 @@ class NatnetClientNode(object):
             self._publish_rigid_body_tfs(header, rigid_bodies)
         if skeletons:
             for skeleton in skeletons:
+                # This doesn't seem to ever be called in V3
+                # TODO: Was this called in V2?
                 self._publish_bone_poses(header, skeleton.rigid_bodies)
         if markers:
             self._publish_marker_points(header, markers)
