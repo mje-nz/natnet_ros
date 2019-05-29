@@ -5,9 +5,9 @@
 source src/natnet_ros/ci_util.sh
 
 travis_run apt-get update
-travis_run apt-get install -y python-catkin-tools python-coverage
+travis_run apt-get install -y python-catkin-tools python-coverage python-pip
 
-rosdep install -y --from-paths src --ignore-src
+travis_run rosdep install -y --from-paths src --ignore-src
 travis_run catkin config --install
 travis_run catkin build --no-status --summarize
 source install/setup.bash
