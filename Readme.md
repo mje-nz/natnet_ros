@@ -132,6 +132,10 @@ rosrun tf static_transform_publisher 0 0 0 0 0 1.57079632679 mocap_z_up mocap 10
 
   Use fake NatNet 2.10 data instead of connecting to a real server.
 
+* `~debug` (`bool`, default: false)
+
+  Enable debug logging.
+
 * `~rate` (`int`, default: 100)
 
   If `fake` or `fake_v2` is true, the rate at which to publish the fake data (in Hz).

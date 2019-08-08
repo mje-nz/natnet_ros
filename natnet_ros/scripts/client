@@ -285,6 +285,13 @@ class NatnetClientNode(object):
 
 if __name__ == '__main__':
     rospy.init_node('mocap', disable_signals=True)
+    if rospy.get_param('~debug', None):
+        # Can't get parameters until init_node, and the only official way to set the ROS logger level is using
+        # init_node, so just hack it
+        import logging
+        logging.getLogger('rosout').setLevel(logging.DEBUG)
+        log_level = rospy.DEBUG
+        rospy.logdebug('Debug logging enabled')
     try:
         node = NatnetClientNode()
         node.run()
