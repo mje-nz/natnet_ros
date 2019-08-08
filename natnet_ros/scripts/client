@@ -270,10 +270,8 @@ class NatnetClientNode(object):
 
     def run(self):
         if rospy.get_param('~fake', False):
-            print('a')
             client = self.fake_connect()
         elif rospy.get_param('~fake_v2', False):
-            print('b')
             client = self.fake_connect(use_v2=True)
         else:
             server = rospy.get_param('~server', None)
