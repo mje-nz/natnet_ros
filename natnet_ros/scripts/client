@@ -199,7 +199,7 @@ class NatnetClientNode(object):
                 rate = float(rate)
             except ValueError:
                 log.warning('Invalid rate %s, using no rate limit', rate)
-                rate=None
+                rate = None
             log.info('Using fake client')
             client = natnet.fakes.SingleFrameFakeClient.fake_connect(rate, self.log, test_data_path)
         else:
@@ -212,6 +212,13 @@ class NatnetClientNode(object):
 
 if __name__ == '__main__':
     rospy.init_node('mocap', disable_signals=True)
+    if rospy.get_param('~debug', None):
+        # Can't get parameters until init_node, and the only official way to set the ROS logger level is using
+        # init_node, so just hack it
+        import logging
+        logging.getLogger('rosout').setLevel(logging.DEBUG)
+        log_level = rospy.DEBUG
+        rospy.logdebug('Debug logging enabled')
     try:
         node = NatnetClientNode()
         node.run()
