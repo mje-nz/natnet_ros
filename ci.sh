@@ -17,7 +17,7 @@ travis_run catkin_test_results --verbose
 
 mkdir out
 cp ~/.ros/.coverage out/
-cp src/natnet_ros/codecov.yml out/
+cp src/natnet_ros/.codecov.yml out/
 cd out
 travis_run python -m coverage report
 travis_run python -m coverage xml -i

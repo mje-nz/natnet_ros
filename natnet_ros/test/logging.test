@@ -1,5 +1,11 @@
 <launch>
-  <test test-name="logtest"
-        pkg="natnet_ros" type="logtest">
+  <!-- Make sure to update the other tests if you change this -->
+  <arg name="coverage" default="true" />
+  <arg name="_launch_prefix" if="$(arg coverage)"
+       value="python -m coverage run -a --branch --include=*natnet_ros*" />
+  <arg name="_launch_prefix" unless="$(arg coverage)" value="" />
+
+  <test test-name="logtest" pkg="natnet_ros" type="logtest"
+        launch-prefix="$(arg _launch_prefix)">
   </test>
 </launch>

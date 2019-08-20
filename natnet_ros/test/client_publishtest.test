@@ -2,7 +2,8 @@
   <!-- Make sure to update the other tests if you change this -->
   <arg name="rate" default="10" />
   <arg name="coverage" default="true" />
-  <arg name="_launch_prefix" if="$(arg coverage)" value="python -m coverage run -a --source=$(find natnet_ros)" />
+  <arg name="_launch_prefix" if="$(arg coverage)"
+       value="python -m coverage run -a --branch --include=*natnet_ros*" />
   <arg name="_launch_prefix" unless="$(arg coverage)" value="" />
 
 
