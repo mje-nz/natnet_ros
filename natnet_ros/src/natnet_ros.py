@@ -36,10 +36,10 @@ class RosLogger(natnet.Logger):
         rospy.loginfo(*args, **kwargs)
 
     def warning(self, *args, **kwargs):
-        rospy.logwarning(*args, **kwargs)
+        rospy.logwarn(*args, **kwargs)
 
     def error(self, *args, **kwargs):
-        rospy.logerror(*args, **kwargs)
+        rospy.logerr(*args, **kwargs)
 
     def fatal(self, *args, **kwargs):
         rospy.logfatal(*args, **kwargs)
