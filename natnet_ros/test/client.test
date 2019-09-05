@@ -9,6 +9,7 @@
 
   <node pkg="natnet_ros" type="client" name="mocap" launch-prefix="$(arg _launch_prefix)">
     <param name="fake" value="True"/>
+    <param name="debug" value="True"/>
     <param name="rate" value="$(arg rate)"/>
   </node>
 
