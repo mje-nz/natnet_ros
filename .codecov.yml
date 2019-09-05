@@ -6,6 +6,4 @@ coverage:
 # Codecov needs all paths to be relative to src dir
 # https://docs.codecov.io/docs/fixing-paths
 fixes:
-  - "/catkin_ws/::"
-  - "src/natnet_ros/::"
-  - "devel/.private/natnet_ros/lib/python2.7/dist-packages/natnet_ros/::natnet_ros/src/natnet_ros/"
+  - "/catkin_ws/devel/.private/natnet_ros/lib/python2.7/dist-packages/natnet_ros/::natnet_ros/src/natnet_ros/"

@@ -15,9 +15,10 @@ source devel/setup.bash
 travis_run catkin build --catkin-make-args run_tests -- --no-status --summarize
 travis_run catkin_test_results --verbose
 
-mkdir out
+# Codecov doesn't seem to cope outside of a git repo?
+cd src/natnet_ros
 cp ~/.ros/.coverage .
 travis_run python -m coverage report
 travis_run python -m coverage xml -i
 # https://github.com/codecov/codecov-bash/issues/100
-travis_run bash <(curl -s https://codecov.io/bash) -y src/natnet_ros/.codecov.yml
+travis_run bash <(curl -s https://codecov.io/bash) -Z
