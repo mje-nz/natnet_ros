@@ -12,7 +12,7 @@ class LogTest(unittest.TestCase):
 
     def __init__(self, *args):
         super(LogTest, self).__init__(*args)
-        rospy.init_node("logtest", log_level=rospy.DEBUG)
+        rospy.init_node("logtest", anonymous=True, log_level=rospy.DEBUG)
 
     def setUp(self):
         self.logger = RosLogger()
