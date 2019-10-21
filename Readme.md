@@ -3,15 +3,20 @@
 [![codecov](https://codecov.io/gh/mje-nz/natnet_ros/branch/master/graph/badge.svg)](https://codecov.io/gh/mje-nz/natnet_ros)
 
 This package contains a ROS driver for the NatNet protocol used by the NaturalPoint OptiTrack motion capture system.
-It supports NatNet version 3.0 (the version used by Motive 2.0), which is a bit more efficient and adds more accurate timing.
+It supports NatNet versions 3.0 and 3.1 (the versions used by Motive 2.0 and 2.1), which are a bit more efficient than older verions and add more accurate timing.
 The actual NatNet implementation is in [mje-nz/python_natnet](https://github.com/mje-nz/python_natnet), which is included as a submodule and repackaged.
 
-Only tested on Motive 2.0, although 2.1 is reported to work and older versions (i.e., older NatNet protocol versions) probably mostly work.
+The NatNet protocol is used for streaming live motion capture data (rigid bodies, skeletons etc) across a network.
+If you're just looking to record some motion capture data and you don't need to synchronise it with other sensors, the easiest method is to record it in Motive directly.
+
+Only tested on Motive 2.0 and 2.1, although older versions (i.e., older NatNet protocol versions) probably mostly work.
 Skeletons, force plates, and other peripherals probably mostly work in the underlying library but are not tested and are not published as ROS topics.
 
-Only supported on ROS Kinetic, but it works on Indigo and probably on newer distributions too.
-The underlying library supports Python 2.7 and 3.4-3.6 on Linux, Windows and macOS.
+Only supported on ROS Melodic and Kinetic, but it works on Indigo and probably on newer distributions too.
+The underlying library supports Python 2.7 and 3.4+ on Linux, Windows and macOS.
 Both this package and the library have CI for all supported platforms.
+
+**Note**: The `dev` branch is quite a bit ahead of `master` at the moment; if you run into problems then check if they're fixed there.
 
 Features:
 
